@@ -5,7 +5,7 @@ HTMLer is a simple HTML generation library for Python.
 
 ## Build status
 
-To do.
+[![codecov](https://codecov.io/gh/ashep/htmler/branch/master/graph/badge.svg)](https://codecov.io/gh/ashep/htmler)
 
 
 ## Features
@@ -27,16 +27,8 @@ pip install htmler
 
 ## Usage
 
-```python
-from htmler import Html, Head, Body, Script, P, A
+To do.
 
-Html(
-    Head(
-        
-    )
-)
-
-```
 
 ## Documentation
 
