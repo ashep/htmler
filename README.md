@@ -5,7 +5,8 @@ HTMLer is a simple HTML generation library for Python.
 
 ## Build status
 
-[![codecov](https://codecov.io/gh/ashep/htmler/branch/master/graph/badge.svg)](https://codecov.io/gh/ashep/htmler)
+[![Build Status](https://travis-ci.org/ashep/htmler.svg?branch=master)](https://travis-ci.org/ashep/htmler)
+[![Coverage](https://codecov.io/gh/ashep/htmler/branch/master/graph/badge.svg)](https://codecov.io/gh/ashep/htmler)
 
 
 ## Features
@@ -16,7 +17,7 @@ HTMLer is a simple HTML generation library for Python.
 
 ## Requirements
 
-Python 3.
+Python >=3.6
 
 
 ## Installation
@@ -27,18 +28,60 @@ pip install htmler
 
 ## Usage
 
-To do.
+This example:
 
+```python
+from htmler import Html, Head, Body, Meta, Title, Script, Link, P, A
+
+doc = Html(
+    Head(
+        Meta(charset='utf-8'),
+        Title('Hello World Document'),
+        Script(src='main.js'),
+        Link(rel='stylesheet', src='main.css'),
+    ),
+    Body(
+        P(
+            A('Hello World!', href="https://en.wikipedia.org/wiki/%22Hello,_World!%22_program")
+        )
+    ),
+    lang="en",
+)
+
+print(doc)
+```
+
+will provide following output:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>
+            Hello World Document
+        </title>
+        <script src="main.js"></script>
+        <link rel="stylesheet" src="main.css">
+    </head>
+    <body>
+        <p>
+            <a href="https://en.wikipedia.org/wiki/%22Hello,_World!%22_program">Hello World!</a>
+        </p>
+    </body>
+</html>
+```
 
 ## Documentation
 
-To do.
+Work in progress.
 
 
-## Roadmap
+## Testing
 
-* Write documentation.
-
+```bash
+python setup.py test
+```
 
 ## Contributing
 
@@ -75,6 +118,11 @@ Your commit message should describe what the commit, when applied, does to the
 code – not what you did to the code.
 
 
+## Roadmap
+
+* Write documentation.
+
+
 ## Support
 
 If you have any issues or enhancement proposals feel free to report them via 
@@ -84,6 +132,12 @@ project's [Issue Tracker](https://github.com/ashep/htmler/issues).
 ## Authors
 
 * [Oleksandr Shepetko](https://shepetko.com) -- initial work.
+
+
+## Credits
+
+This project was inspired by [PyHTML](https://github.com/cenkalti/pyhtml) 
+library.
 
 
 ## License

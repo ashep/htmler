@@ -4,6 +4,7 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
+from os import linesep
 from .base import Element, SingleTagElement, INDENT_WIDTH
 
 
@@ -16,16 +17,16 @@ class BlockElement(Element):
         """
         r = super()._render_open_tag(indent)
 
-        return (r + '\n') if (indent and (len(self) or isinstance(self, SingleTagElement))) else r
+        return (r + linesep) if (indent and (len(self) or isinstance(self, SingleTagElement))) else r
 
     def _render_children(self, indent: bool) -> str:
         r = super()._render_children(indent)
 
         if indent:
             rn = ''
-            for l in r.split('\n'):
+            for l in r.split(linesep):
                 if l:
-                    rn += (' ' * INDENT_WIDTH) + l + '\n'
+                    rn += (' ' * INDENT_WIDTH) + l + linesep
             r = rn
 
         return r
@@ -33,7 +34,7 @@ class BlockElement(Element):
     def _render_close_tag(self, indent: bool = True) -> str:
         r = super()._render_close_tag(indent)
 
-        return (r + '\n') if indent else r
+        return (r + linesep) if indent else r
 
 
 class Address(BlockElement):
@@ -243,7 +244,9 @@ class Hr(BlockElement):
 class Html(BlockElement):
     """HTML Element
     """
-    pass
+
+    def _render_open_tag(self, indent: bool = True) -> str:
+        return '<!DOCTYPE html>' + (linesep if indent else '') + super()._render_open_tag(indent)
 
 
 class Iframe(BlockElement):

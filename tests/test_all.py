@@ -5,6 +5,7 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 import pytest, random, string, htmler
+from os import linesep
 from random import randint as random_int
 from typing import Union, List, Type, Tuple
 from inspect import isclass
@@ -22,7 +23,7 @@ def _get_elements_classes(subcls_only: Union[Type, Tuple[Type, ...]] = None,
     for n in dir(htmler):
         cls = getattr(htmler, n)
 
-        if not isclass(cls) or issubclass(cls, htmler.TagLessElement):
+        if not isclass(cls) or issubclass(cls, (htmler.TagLessElement, htmler.Html)):
             continue
 
         if issubclass(cls, htmler.Element) and not (except_subcls and issubclass(cls, except_subcls)):
@@ -75,12 +76,12 @@ class TestElements:
         for cls in _get_elements_classes(htmler.BlockElement):
             em = cls()
             if isinstance(em, htmler.SingleTagElement):
-                assert str(em) == f'<{em.name}>\n'
+                assert str(em) == f'<{em.name}>{linesep}'
             else:
                 if len(em):
-                    assert str(em) == f'<{em.name}>\n</{em.name}>\n'
+                    assert str(em) == f'<{em.name}>{linesep}</{em.name}>{linesep}'
                 else:
-                    assert str(em) == f'<{em.name}></{em.name}>\n'
+                    assert str(em) == f'<{em.name}></{em.name}>{linesep}'
 
         for cls in _get_elements_classes(htmler.InlineElement):
             em = cls()
@@ -123,7 +124,7 @@ class TestElements:
         """Test of wrapping an element with another one
         """
         for child_cls in _get_elements_classes():
-            for wrapper_cls in _get_elements_classes(except_subcls=htmler.SingleTagElement):
+            for wrapper_cls in _get_elements_classes(except_subcls=(htmler.SingleTagElement, htmler.Html)):
                 child = child_cls()
                 wrapper = child.wrap(wrapper_cls())
                 assert wrapper.render(False) == f'<{wrapper.name}>{child.render(False)}</{wrapper.name}>'
@@ -222,18 +223,18 @@ class TestElements:
             css_3 = random_str()
 
             em = cls(css=f'{css_1} {css_2}')
-            assert em.has_css(css_1) == True
-            assert em.has_css(css_2) == True
-            assert em.has_css(css_3) == False
+            assert em.has_css(css_1) is True
+            assert em.has_css(css_2) is True
+            assert em.has_css(css_3) is False
 
             em.add_css(css_3)
-            assert em.has_css(css_3) == True
+            assert em.has_css(css_3) is True
 
             em.remove_css(css_1)
-            assert em.has_css(css_1) == False
+            assert em.has_css(css_1) is False
 
             em.toggle_css(css_1)
-            assert em.has_css(css_1) == True
+            assert em.has_css(css_1) is True
 
     def test_tagless(self):
         """Test of rendering of the TagLessElement
@@ -248,4 +249,4 @@ class TestElements:
         for cls in _get_elements_classes(htmler.BlockElement, htmler.SingleTagElement):
             s = random_str()
             em = cls(s)
-            assert em.render() == f'<{em.name}>\n{(htmler.INDENT_WIDTH * " ")}{s}\n</{em.name}>\n'
+            assert em.render() == f'<{em.name}>{linesep}{(htmler.INDENT_WIDTH * " ")}{s}{linesep}</{em.name}>{linesep}'
