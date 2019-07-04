@@ -1,0 +1,10 @@
+*.egg-info
+__pycache__
+/.coverage
+/.eggs
+/.idea
+/build
+/check.py
+/dist
+/env
+/htmlcov
