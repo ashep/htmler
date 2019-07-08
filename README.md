@@ -83,6 +83,13 @@ Work in progress.
 python setup.py test
 ```
 
+or
+
+```bash
+make test
+```
+
+
 ## Contributing
 
 If you want to contribute to a project and make it better, your help is very 
