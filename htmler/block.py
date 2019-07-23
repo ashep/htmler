@@ -12,17 +12,27 @@ class BlockElement(Element):
     """Block element
     """
 
+    def __init__(self, *args, **kwargs):
+        """Init
+        """
+        super().__init__(*args, **kwargs)
+
+        self._indent_children = True
+
     def _render_open_tag(self, indent: bool = True) -> str:
         """Render opening tag
         """
         r = super()._render_open_tag(indent)
 
-        return (r + linesep) if (indent and (len(self) or isinstance(self, SingleTagElement))) else r
+        if indent and (len(self) or isinstance(self, SingleTagElement)) and self._indent_children:
+            r += linesep
+
+        return r
 
     def _render_children(self, indent: bool) -> str:
         r = super()._render_children(indent)
 
-        if indent:
+        if indent and self._indent_children:
             rn = ''
             for l in r.split(linesep):
                 if l:
@@ -432,7 +442,12 @@ class Template(BlockElement):
 class Textarea(BlockElement):
     """TEXTAREA Element
     """
-    pass
+    def __init__(self, *args, **kwargs):
+        """Init
+        """
+        super().__init__(*args, **kwargs)
+
+        self._indent_children = False
 
 
 class Tfoot(BlockElement):

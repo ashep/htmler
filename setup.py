@@ -7,7 +7,7 @@ with open('README.md') as fh:
 
 setup(
     name='htmler',
-    version='0.1.1',
+    version='0.1.2',
     author='Oleksandr Shepetko',
     author_email='a@shepetko.com',
     description='A simple HTML generation library',

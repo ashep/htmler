@@ -248,5 +248,10 @@ class TestElements:
         """
         for cls in _get_elements_classes(htmler.BlockElement, htmler.SingleTagElement):
             s = random_str()
-            em = cls(s)
-            assert em.render() == f'<{em.name}>{linesep}{(htmler.INDENT_WIDTH * " ")}{s}{linesep}</{em.name}>{linesep}'
+            em = cls(s)  # type: htmler.BlockElement
+            if em._indent_children:
+                expected = f'<{em.name}>{linesep}{(htmler.INDENT_WIDTH * " ")}{s}{linesep}</{em.name}>{linesep}'
+            else:
+                expected = f'<{em.name}>{s}</{em.name}>{linesep}'
+
+            assert em.render() == expected

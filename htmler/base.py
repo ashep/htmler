@@ -73,7 +73,7 @@ class Node(ABC):
     def append_child(self, child):
         """Append a child node
 
-        :type Node: child
+        :type child: Node
         :rtype Node
         """
         if not isinstance(child, Node):
@@ -198,7 +198,7 @@ class Element(Node):
         """
         return self._attrs[attr] if attr in self._attrs else default
 
-    def append_child(self, child: Union[Node, str]):
+    def append_child(self, child: Union[Node, str]) -> Node:
         """Append a child node
         """
         if isinstance(child, str):
