@@ -72,6 +72,15 @@ will provide following output:
 </html>
 ```
 
+If indentation is not necessary, just call `render()` method with `indent` 
+argument set to `False`:
+
+```python
+
+print(doc.render(indent=False))
+``` 
+
+
 ## Documentation
 
 Work in progress.

@@ -50,15 +50,15 @@ class TestElements:
 
         # Element with no tags
         if isinstance(em, htmler.TagLessElement):
-            assert em.render(False) == rendered_children
+            assert em.render(indent=False) == rendered_children
 
         # Element with no closing tags
         elif isinstance(em, htmler.SingleTagElement):
-            assert em.render(False) == f'<{em.name}{attrs_str}>'
+            assert em.render(indent=False) == f'<{em.name}{attrs_str}>'
 
         # Element with opening and closing tags pair
         else:
-            assert em.render(False) == f'<{em.name}{attrs_str}>{rendered_children}</{em.name}>'
+            assert em.render(indent=False) == f'<{em.name}{attrs_str}>{rendered_children}</{em.name}>'
 
     def test_not_abc(self):
         with pytest.raises(TypeError):
@@ -78,10 +78,7 @@ class TestElements:
             if isinstance(em, htmler.SingleTagElement):
                 assert str(em) == f'<{em.name}>{linesep}'
             else:
-                if len(em):
-                    assert str(em) == f'<{em.name}>{linesep}</{em.name}>{linesep}'
-                else:
-                    assert str(em) == f'<{em.name}></{em.name}>{linesep}'
+                assert str(em) == f'<{em.name}>{linesep}</{em.name}>{linesep}'
 
         for cls in _get_elements_classes(htmler.InlineElement):
             em = cls()
@@ -127,7 +124,7 @@ class TestElements:
             for wrapper_cls in _get_elements_classes(except_subcls=(htmler.SingleTagElement, htmler.Html)):
                 child = child_cls()
                 wrapper = child.wrap(wrapper_cls())
-                assert wrapper.render(False) == f'<{wrapper.name}>{child.render(False)}</{wrapper.name}>'
+                assert wrapper.render(indent=False) == f'<{wrapper.name}>{child.render(indent=False)}</{wrapper.name}>'
 
     def test_text(self):
         """Test of adding text to elements
@@ -192,7 +189,7 @@ class TestElements:
             s = random_str()
             em = cls()
             em.append_text(s)
-            assert em.render(False) == f'<{em.name}>{s}</{em.name}>'
+            assert em.render(indent=False) == f'<{em.name}>{s}</{em.name}>'
 
     def test_append_comment(self):
         """Test of append_comment() method
@@ -201,7 +198,7 @@ class TestElements:
             s = random_str()
             em = cls()
             em.append_comment(s)
-            assert em.render(False) == f'<{em.name}><!-- {s} --></{em.name}>'
+            assert em.render(indent=False) == f'<{em.name}><!-- {s} --></{em.name}>'
 
     def test_get_element_by_id(self):
         for parent_cls in _get_elements_classes(except_subcls=htmler.SingleTagElement):
@@ -249,9 +246,6 @@ class TestElements:
         for cls in _get_elements_classes(htmler.BlockElement, htmler.SingleTagElement):
             s = random_str()
             em = cls(s)  # type: htmler.BlockElement
-            if em._indent_children:
-                expected = f'<{em.name}>{linesep}{(htmler.INDENT_WIDTH * " ")}{s}{linesep}</{em.name}>{linesep}'
-            else:
-                expected = f'<{em.name}>{s}</{em.name}>{linesep}'
+            expected = f'<{em.name}>{linesep}{(htmler.INDENT_WIDTH * " ")}{s}{linesep}</{em.name}>{linesep}'
 
             assert em.render() == expected

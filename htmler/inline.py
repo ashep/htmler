@@ -217,6 +217,12 @@ class Sup(InlineElement):
     pass
 
 
+class Textarea(InlineElement):
+    """TEXTAREA Element
+    """
+    pass
+
+
 class Time(InlineElement):
     """TIME Element
     """

@@ -4,47 +4,57 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from os import linesep
-from .base import Element, SingleTagElement, INDENT_WIDTH
+from os import environ, linesep
+from .base import Text, Element, SingleTagElement
+from .inline import InlineElement
+
+INDENT_WIDTH = environ.get('HTMLER_INDENT_WIDTH', 4)
 
 
 class BlockElement(Element):
     """Block element
     """
 
-    def __init__(self, *args, **kwargs):
-        """Init
-        """
-        super().__init__(*args, **kwargs)
-
-        self._indent_children = True
-
-    def _render_open_tag(self, indent: bool = True) -> str:
+    def _render_open_tag(self, **kwargs) -> str:
         """Render opening tag
         """
-        r = super()._render_open_tag(indent)
+        indent = kwargs.get('indent', True)
+        depth = kwargs.get('depth', 0)
+        r = super()._render_open_tag(**kwargs)
 
-        if indent and (len(self) or isinstance(self, SingleTagElement)) and self._indent_children:
-            r += linesep
+        return ((' ' * INDENT_WIDTH * depth) + r + linesep) if indent else r
+
+    def _render_children(self, **kwargs) -> str:
+        indent = kwargs.get('indent', True)
+        depth = kwargs.get('depth', 0) + 1
+        r = ''
+
+        i = 0
+        prev_child = None
+        for child in self:
+            if indent:
+                if (i == 0 or isinstance(prev_child, BlockElement)) and isinstance(child, (Text, InlineElement)):
+                    r += ' ' * INDENT_WIDTH * depth
+                if isinstance(child, BlockElement) and isinstance(prev_child, (Text, InlineElement)):
+                    r += linesep
+
+            kwargs['depth'] = depth
+            r += child.render(**kwargs)
+
+            if indent and i == (len(self) - 1) and isinstance(child, (Text, InlineElement)):
+                r += linesep
+
+            i += 1
+            prev_child = child
 
         return r
 
-    def _render_children(self, indent: bool) -> str:
-        r = super()._render_children(indent)
+    def _render_close_tag(self, **kwargs) -> str:
+        indent = kwargs.get('indent', True)
+        depth = kwargs.get('depth', 0)
+        r = super()._render_close_tag(**kwargs)
 
-        if indent and self._indent_children:
-            rn = ''
-            for l in r.split(linesep):
-                if l:
-                    rn += (' ' * INDENT_WIDTH) + l + linesep
-            r = rn
-
-        return r
-
-    def _render_close_tag(self, indent: bool = True) -> str:
-        r = super()._render_close_tag(indent)
-
-        return (r + linesep) if indent else r
+        return ((' ' * INDENT_WIDTH * depth) + r + linesep) if indent else r
 
 
 class Address(BlockElement):
@@ -255,8 +265,8 @@ class Html(BlockElement):
     """HTML Element
     """
 
-    def _render_open_tag(self, indent: bool = True) -> str:
-        return '<!DOCTYPE html>' + (linesep if indent else '') + super()._render_open_tag(indent)
+    def _render_open_tag(self, **kwargs) -> str:
+        return '<!DOCTYPE html>' + (linesep if kwargs.get('indent', True) else '') + super()._render_open_tag(**kwargs)
 
 
 class Iframe(BlockElement):
@@ -437,17 +447,6 @@ class Template(BlockElement):
     """TEMPLATE Element
     """
     pass
-
-
-class Textarea(BlockElement):
-    """TEXTAREA Element
-    """
-    def __init__(self, *args, **kwargs):
-        """Init
-        """
-        super().__init__(*args, **kwargs)
-
-        self._indent_children = False
 
 
 class Tfoot(BlockElement):

@@ -5,11 +5,8 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from typing import List, Generator, Union, Optional
-from os import environ
 from abc import ABC, abstractmethod
 from copy import copy
-
-INDENT_WIDTH = environ.get('HTMLER_INDENT_WIDTH', 4)
 
 _NODE_SINGLE_ATTRS = ('allowfullscreen', 'async', 'checked', 'hidden', 'selected', 'required')
 _NODE_REPLACE_ATTRS = {
@@ -93,7 +90,7 @@ class Node(ABC):
         return wrapper
 
     @abstractmethod
-    def render(self, indent: bool = True) -> str:
+    def render(self, **kwargs) -> str:
         """Render the node
         """
         pass  # pragma: no cover
@@ -138,7 +135,7 @@ class Text(Node):
         """
         raise ValueError(f"'{self._name}' element cannot contain children")
 
-    def render(self, indent: bool = True) -> str:
+    def render(self, **kwargs) -> str:
         """Render the node
         """
         return self._content
@@ -148,7 +145,7 @@ class Comment(Text):
     """Comment Node
     """
 
-    def render(self, indent: bool = True) -> str:
+    def render(self, **kwargs) -> str:
         """Render the node
         """
         return f'<!-- {self._content} -->'
@@ -255,27 +252,27 @@ class Element(Node):
         """
         return self.remove_css(css_class) if self.has_css(css_class) else self.add_css(css_class)
 
-    def _render_open_tag(self, indent: bool = True) -> str:
+    def _render_open_tag(self, **kwargs) -> str:
         """Render opening tag
         """
         return f'<{self._name}{html_attrs_str(self._attrs)}>'
 
-    def _render_children(self, indent: bool) -> str:
+    def _render_children(self, **kwargs) -> str:
         """Render child nodes
         """
-        return ''.join(child.render(indent) for child in self)
+        return ''.join(child.render(**kwargs) for child in self)
 
-    def _render_close_tag(self, indent: bool = True) -> str:
+    def _render_close_tag(self, **kwargs) -> str:
         """Render closing tag
         """
         return f'</{self._name}>'
 
-    def render(self, indent: bool = True) -> str:
+    def render(self, **kwargs) -> str:
         """Render the node
         """
-        r = self._render_open_tag(indent)
-        r += self._render_children(indent)
-        r += self._render_close_tag(indent)
+        r = self._render_open_tag(**kwargs)
+        r += self._render_children(**kwargs)
+        r += self._render_close_tag(**kwargs)
 
         return r
 
@@ -289,22 +286,22 @@ class SingleTagElement(Element):
         """
         raise ValueError(f"'{self._name}' element cannot contain children")
 
-    def render(self, indent: bool = True) -> str:
+    def render(self, **kwargs) -> str:
         """Render the element
         """
-        return self._render_open_tag(indent)
+        return self._render_open_tag(**kwargs)
 
 
 class TagLessElement(Element):
     """Element With No Tags
     """
 
-    def _render_open_tag(self, indent: bool = True) -> str:
+    def _render_open_tag(self, **kwargs) -> str:
         """Render opening tag
         """
         return ''
 
-    def _render_close_tag(self, indent: bool = True) -> str:
+    def _render_close_tag(self, **kwargs) -> str:
         """Render closing tag
         """
         return ''
